@@ -1,0 +1,30 @@
+<%= form_with model: @listing, local: true, html: { class: "space-y-4 p-4" } do |f| %>
+  <div><%= f.label :title %><%= f.text_field :title, class: "w-full border rounded px-3 py-2" %></div>
+  <div><%= f.label :description %><%= f.text_area :description, rows: 4, class: "w-full border rounded px-3 py-2" %></div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <div><%= f.label :price_cents, "Price (₾)" %><%= f.number_field :price_cents, step: 100, class: "w-full border rounded px-3 py-2" %></div>
+    <div><%= f.label :currency %><%= f.text_field :currency, value: "GEL", class: "w-full border rounded px-3 py-2" %></div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <%= f.label :category_id, "Category" %>
+      <%= f.collection_select :category_id, Category.order(:name), :id, :name, {}, class: "w-full border rounded px-3 py-2" %>
+    </div>
+    <div>
+      <%= f.label :location_id, "Location" %>
+      <%= f.collection_select :location_id, Location.order(:name), :id, :name, {}, class: "w-full border rounded px-3 py-2" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :photos, "Photos" %>
+    <%= f.file_field :photos, multiple: true, direct_upload: true, accept: "image/*", class: "block w-full border rounded px-3 py-2" %>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit class: "px-4 py-2 rounded-xl border" %>
+    <%= link_to "Cancel", search_path, class: "px-4 py-2 rounded-xl border" %>
+  </div>
+<% end %>

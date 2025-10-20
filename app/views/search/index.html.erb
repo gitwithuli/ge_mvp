@@ -1,0 +1,132 @@
+<div class="sticky top-14 bg-white/90 backdrop-blur z-10 border-b">
+  <div class="px-3 py-2">
+    <%= form_with url: search_path, method: :get, local: true, class: "flex flex-col gap-2 w-full" do %>
+      <div class="flex gap-2">
+        <input type="text" name="q" value="<%= params[:q] %>" placeholder="Search…" class="flex-1 h-10 px-3 py-2 rounded-xl border" />
+        <%= link_to "Post", new_listing_path, class: "h-10 px-4 inline-flex items-center rounded-xl border" %>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <select name="category_id" class="h-10 px-3 py-2 rounded-xl border">
+          <option value="">All categories</option>
+          <% (@categories || Category.order(:name)).each do |c| %>
+            <option value="<%= c.id %>" <%= "selected" if params[:category_id].to_s == c.id.to_s %>><%= c.name %></option>
+          <% end %>
+        </select>
+
+        <select name="location_id" class="h-10 px-3 py-2 rounded-xl border">
+          <option value="">All locations</option>
+          <% (@locations || Location.order(:name)).each do |l| %>
+            <option value="<%= l.id %>" <%= "selected" if params[:location_id].to_s == l.id.to_s %>><%= l.name %></option>
+          <% end %>
+        </select>
+
+        <select name="condition" class="h-10 px-3 py-2 rounded-xl border">
+          <option value="">Any condition</option>
+          <option value="brand_new" <%= "selected" if params[:condition] == "brand_new" %>>New</option>
+          <option value="used"      <%= "selected" if params[:condition] == "used" %>>Used</option>
+        </select>
+
+        <div class="flex gap-2">
+          <input type="number" inputmode="numeric" min="0" name="min_price" value="<%= params[:min_price] %>" placeholder="Min ₾" class="h-10 w-full px-3 py-2 rounded-xl border" />
+          <input type="number" inputmode="numeric" min="0" name="max_price" value="<%= params[:max_price] %>" placeholder="Max ₾" class="h-10 w-full px-3 py-2 rounded-xl border" />
+        </div>
+
+        <select name="sort" class="h-10 px-3 py-2 rounded-xl border">
+          <option value="latest" <%= "selected" if params[:sort].blank? || params[:sort]=="latest" %>>Latest</option>
+          <option value="price_asc"  <%= "selected" if params[:sort]=="price_asc" %>>Price ↑</option>
+          <option value="price_desc" <%= "selected" if params[:sort]=="price_desc" %>>Price ↓</option>
+        </select>
+      </div>
+
+      <div>
+        <button class="h-10 px-4 rounded-xl border">Filter</button>
+        <% if params.except(:controller, :action, :locale).present? %>
+          <%= link_to "Reset", search_path, class: "ml-2 text-sm text-gray-600 underline" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<%# Result count + active filter chips %>
+<% qp = request.query_parameters.symbolize_keys %>
+<div class="px-3 py-2 flex flex-wrap items-center gap-2 text-sm text-gray-600">
+  <div><strong><%= @listings.size %></strong> results</div>
+
+  <% if qp[:q].present? %>
+    <%= link_to "“#{qp[:q]}” ✕", search_path(qp.except(:q)), class: "px-2 py-1 rounded-full border bg-gray-50" %>
+  <% end %>
+
+  <% if qp[:category_id].present? %>
+    <% cname = Category.find_by(id: qp[:category_id])&.name || "Category ##{qp[:category_id]}" %>
+    <%= link_to "#{cname} ✕", search_path(qp.except(:category_id)), class: "px-2 py-1 rounded-full border bg-gray-50" %>
+  <% end %>
+
+  <% if qp[:location_id].present? %>
+    <% lname = Location.find_by(id: qp[:location_id])&.name || "Location ##{qp[:location_id]}" %>
+    <%= link_to "#{lname} ✕", search_path(qp.except(:location_id)), class: "px-2 py-1 rounded-full border bg-gray-50" %>
+  <% end %>
+
+  <% if qp[:condition].present? %>
+    <% label = qp[:condition] == "brand_new" ? "New" : "Used" %>
+    <%= link_to "#{label} ✕", search_path(qp.except(:condition)), class: "px-2 py-1 rounded-full border bg-gray-50" %>
+  <% end %>
+
+  <% if qp[:min_price].present? %>
+    <%= link_to "Min ₾#{qp[:min_price]} ✕", search_path(qp.except(:min_price)), class: "px-2 py-1 rounded-full border bg-gray-50" %>
+  <% end %>
+
+  <% if qp[:max_price].present? %>
+    <%= link_to "Max ₾#{qp[:max_price]} ✕", search_path(qp.except(:max_price)), class: "px-2 py-1 rounded-full border bg-gray-50" %>
+  <% end %>
+
+  <% if qp.except(:controller, :action, :locale).present? %>
+    <%= link_to "Reset", search_path, class: "ml-auto underline" %>
+  <% end %>
+</div>
+
+<% if @listings.blank? %>
+  <div class="p-6 text-center text-gray-500">No listings found.</div>
+<% end %>
+
+<div class="p-3 grid grid-cols-2 gap-3 md:grid-cols-3">
+  <% @listings.each do |l| %>
+    <div class="relative rounded-2xl overflow-hidden border">
+      <div class="absolute top-2 left-2 right-2 z-10 flex items-center">
+        <%# Save on the left %>
+        <% if user_signed_in? %>
+          <% if current_user.favorites.exists?(listing_id: l.id) %>
+            <%= button_to "♥ Saved", listing_favorite_path(l), method: :delete, class: "rounded-full bg-white/90 px-2 py-1 text-xs" %>
+          <% else %>
+            <%= button_to "♡ Save", listing_favorite_path(l), method: :post, class: "rounded-full bg-white/90 px-2 py-1 text-xs" %>
+          <% end %>
+        <% else %>
+          <%= link_to "♡ Save", new_user_session_path, class: "rounded-full bg-white/90 px-2 py-1 text-xs" %>
+        <% end %>
+
+        <%# Promoted on the right %>
+        <% if l.promoted_until.present? && l.promoted_until > Time.current %>
+          <span class="ml-auto rounded-full bg-white/90 px-2 py-1 text-xs">Promoted</span>
+        <% end %>
+      </div>
+
+      <%= link_to l, class: "block" do %>
+        <% if l.photos.attached? %>
+          <%= image_tag l.photos.first.variant(resize_to_fill: [600, 400]), loading: :lazy, class: "w-full h-auto" %>
+        <% else %>
+          <div class="w-full aspect-[3/2] bg-gray-100"></div>
+        <% end %>
+        <div class="p-3">
+          <div class="font-semibold"><%= number_to_currency((l.price_cents || 0)/100.0, unit: '₾') %></div>
+          <div class="text-sm text-gray-700 truncate"><%= l.title %></div>
+          <div class="text-xs text-gray-500">
+            <%= link_to l.location&.name, (l.location ? location_path(l.location) : "#"), class: "underline" if l.location %>
+            <% if l.location && l.category %> · <% end %>
+            <%= link_to l.category&.name, (l.category ? category_path(l.category) : "#"), class: "underline" if l.category %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,15 @@
+<div class="p-4">
+  <h1 class="text-xl font-bold mb-4"><%= @conversation.listing.title %></h1>
+  <%= turbo_stream_from @conversation %>
+
+  <div id="<%= dom_id(@conversation, :messages) %>" class="space-y-2 mb-3">
+    <% @conversation.messages.includes(:user).order(:created_at).each do |m| %>
+      <%= render "messages/message", message: m %>
+    <% end %>
+  </div>
+
+  <%= form_with model: [@conversation, @message], data: { turbo_stream: true }, class: "flex gap-2" do |f| %>
+    <%= f.text_area :body, rows: 2, class: "flex-1 border rounded-xl px-3 py-2", placeholder: "Type a message…" %>
+    <%= f.submit "Send", class: "px-4 py-2 border rounded-xl" %>
+  <% end %>
+</div>

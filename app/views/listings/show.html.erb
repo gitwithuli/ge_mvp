@@ -1,0 +1,26 @@
+<div class="p-4 space-y-4">
+  <% if @listing.photos.attached? %>
+    <%= image_tag @listing.photos.first.variant(resize_to_fill: [1200, 800]), class: "w-full rounded-2xl" %>
+  <% else %>
+    <div class="w-full aspect-[3/2] bg-gray-100 rounded-2xl"></div>
+  <% end %>
+
+  <h1 class="text-2xl font-bold"><%= @listing.title %></h1>
+  <div class="text-lg font-semibold"><%= number_to_currency((@listing.price_cents || 0)/100.0, unit: '₾') %></div>
+  <div class="text-gray-600"><%= @listing.location&.name %> · <%= @listing.category&.name %></div>
+  <p class="text-gray-800 whitespace-pre-line"><%= @listing.description %></p>
+
+  <%= link_to "Back to search", search_path, class: "px-4 py-2 rounded-xl border inline-block" %>
+</div>
+<% if defined?(current_user) && current_user %>
+  <% if @listing.user_id != current_user.id %>
+    <div class="mt-4">
+      <%= button_to "Contact seller", conversations_path(listing_id: @listing.slug || @listing.id),
+            method: :post, class: "px-4 py-2 border rounded-xl" %>
+    </div>
+  <% end %>
+<% else %>
+  <div class="mt-4">
+    <%= link_to "Contact seller", new_user_session_path, class: "px-4 py-2 border rounded-xl" %>
+  </div>
+<% end %>

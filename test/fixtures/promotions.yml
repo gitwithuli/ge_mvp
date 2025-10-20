@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  listing: one
+  kind: 1
+  starts_at: 2025-10-20 10:53:41
+  ends_at: 2025-10-20 10:53:41
+  price_cents: 1
+  provider: MyString
+  provider_ref: MyString
+
+two:
+  listing: two
+  kind: 1
+  starts_at: 2025-10-20 10:53:41
+  ends_at: 2025-10-20 10:53:41
+  price_cents: 1
+  provider: MyString
+  provider_ref: MyString

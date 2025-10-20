@@ -1,0 +1,24 @@
+<div class="p-4">
+  <h1 class="text-xl font-bold mb-4">Inbox</h1>
+
+  <% if @conversations.blank? %>
+    <div class="text-gray-500">No conversations yet.</div>
+  <% end %>
+
+  <div class="space-y-2">
+    <% @conversations.each do |c| %>
+      <%= link_to conversation_path(c), class: "block border rounded-xl p-3 hover:bg-gray-50" do %>
+        <div class="font-semibold"><%= c.listing.title %></div>
+        <div class="text-sm text-gray-600">
+          With
+          <% if current_user&.id == c.seller_id %>
+            <%= c.buyer.email %>
+          <% else %>
+            <%= c.seller.email %>
+          <% end %>
+          · <%= (c.last_message_at || c.created_at).strftime("%Y-%m-%d %H:%M") %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

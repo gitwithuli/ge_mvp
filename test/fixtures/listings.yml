@@ -1,0 +1,33 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  category: one
+  location: one
+  title: MyString
+  description: MyText
+  price_cents: 1
+  currency: MyString
+  status: 1
+  condition: 1
+  views_count: 1
+  favorites_count: 1
+  messages_count: 1
+  promoted_until: 2025-10-20 10:53:39
+  slug: MyString
+
+two:
+  user: two
+  category: two
+  location: two
+  title: MyString
+  description: MyText
+  price_cents: 1
+  currency: MyString
+  status: 1
+  condition: 1
+  views_count: 1
+  favorites_count: 1
+  messages_count: 1
+  promoted_until: 2025-10-20 10:53:39
+  slug: MyString

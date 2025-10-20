@@ -1,0 +1,9 @@
+<% mine = message.user_id == current_user&.id %>
+<div class="max-w-[80%] <%= mine ? 'ml-auto text-right' : '' %>">
+  <div class="text-[11px] text-gray-500 mb-0.5">
+    <%= message.user.email %> · <%= message.created_at.strftime("%H:%M") %>
+  </div>
+  <div class="<%= mine ? 'bg-blue-50' : 'bg-gray-100' %> border rounded-2xl px-3 py-2">
+    <%= simple_format h(message.body) %>
+  </div>
+</div>
